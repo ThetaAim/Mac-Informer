@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A safe portfolio demonstration of the Mac Informer IT inventory dashboard.">
+  <title>Mac Informer — Portfolio Demo</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #08111f;
+      --panel: rgba(17, 29, 48, 0.84);
+      --panel-strong: #13233a;
+      --line: rgba(148, 163, 184, 0.18);
+      --text: #e8eef8;
+      --muted: #8ea0b8;
+      --blue: #4ca4ff;
+      --purple: #9d77ff;
+      --green: #39d98a;
+      --amber: #ffba55;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 12% 0%, rgba(76, 164, 255, .16), transparent 30%),
+        radial-gradient(circle at 88% 8%, rgba(157, 119, 255, .12), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      font: 14px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button, select { font: inherit; }
+    .shell { max-width: 1440px; margin: auto; padding: 32px; }
+    header { display: flex; justify-content: space-between; gap: 24px; align-items: flex-start; margin-bottom: 28px; }
+    .brand { display: flex; gap: 14px; align-items: center; }
+    .logo {
+      width: 46px; height: 46px; display: grid; place-items: center; border-radius: 14px;
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      box-shadow: 0 14px 35px rgba(76,164,255,.22); font-size: 23px;
+    }
+    h1 { margin: 0; font-size: 25px; letter-spacing: -.03em; }
+    .subtitle { color: var(--muted); margin-top: 3px; }
+    .demo-badge { color: #bcdcff; background: rgba(76,164,255,.12); border: 1px solid rgba(76,164,255,.25); padding: 7px 11px; border-radius: 999px; }
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+    .card, .toolbar, .table-wrap {
+      background: var(--panel); border: 1px solid var(--line); border-radius: 16px;
+      box-shadow: 0 18px 50px rgba(0,0,0,.18); backdrop-filter: blur(14px);
+    }
+    .card { padding: 18px; }
+    .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+    .number { font-size: 28px; font-weight: 730; margin-top: 6px; }
+    .number.online { color: var(--green); }
+    .number.stale { color: var(--amber); }
+    .toolbar { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 13px; margin-bottom: 18px; }
+    .toolbar-group { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; }
+    button, select {
+      color: var(--text); background: #182a43; border: 1px solid var(--line); border-radius: 9px;
+      padding: 9px 12px; cursor: pointer;
+    }
+    button:hover, select:hover { border-color: rgba(76,164,255,.65); }
+    .primary, .connect { background: linear-gradient(135deg, #267ed8, #6651cc); border: 0; }
+    .table-wrap { overflow: hidden; }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 1120px; }
+    th { color: var(--muted); background: rgba(5,12,23,.38); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+    th, td { padding: 13px 14px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+    tbody tr:hover { background: rgba(76,164,255,.045); }
+    tbody tr.room-start td { border-top: 2px solid rgba(76,164,255,.28); }
+    .room { font-weight: 720; color: #bcdcff; }
+    .host { font-weight: 680; }
+    .muted { color: var(--muted); }
+    .status { display: inline-flex; align-items: center; gap: 7px; padding: 5px 9px; border-radius: 999px; font-weight: 650; }
+    .status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; }
+    .status.online { color: #77edb1; background: rgba(57,217,138,.1); }
+    .status.online::before { background: var(--green); box-shadow: 0 0 10px var(--green); }
+    .status.stale { color: #ffd18b; background: rgba(255,186,85,.1); }
+    .status.stale::before { background: var(--amber); }
+    .actions { display: flex; gap: 7px; }
+    .small { padding: 6px 9px; font-size: 12px; }
+    footer { display: flex; justify-content: space-between; color: var(--muted); margin-top: 18px; font-size: 12px; }
+    #toast {
+      position: fixed; right: 24px; bottom: 24px; max-width: 360px; padding: 13px 16px;
+      background: #e9f2ff; color: #10213a; border-radius: 11px; box-shadow: 0 16px 50px rgba(0,0,0,.35);
+      opacity: 0; transform: translateY(12px); pointer-events: none; transition: .2s ease;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    @media (max-width: 850px) {
+      .shell { padding: 20px; }
+      header, .toolbar { align-items: stretch; flex-direction: column; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">⌘</div>
+        <div><h1>Mac Informer</h1><div class="subtitle">macOS fleet visibility for small IT teams</div></div>
+      </div>
+      <div class="demo-badge">Portfolio interface preview</div>
+    </header>
+
+    <section class="stats" aria-label="Fleet summary">
+      <div class="card"><div class="label">Registered Macs</div><div class="number">8</div></div>
+      <div class="card"><div class="label">Online</div><div class="number online">6</div></div>
+      <div class="card"><div class="label">Stale</div><div class="number stale">2</div></div>
+      <div class="card"><div class="label">Rooms</div><div class="number">3</div></div>
+    </section>
+
+    <section class="toolbar" aria-label="Dashboard controls">
+      <div class="toolbar-group">
+        <select id="roomFilter" aria-label="Filter by room">
+          <option value="all">All rooms</option><option value="2054">Room 2054</option>
+          <option value="2057">Room 2057</option><option value="PLOTT">Plotters</option>
+        </select>
+        <button id="refresh">↻ Refresh dashboard</button>
+      </div>
+      <div class="toolbar-group">
+        <button data-demo="Wake-on-LAN request prepared for the selected room.">Wake selected room</button>
+        <button class="primary" data-demo="The production version exports a live Ansible YAML inventory.">Export Ansible YAML</button>
+      </div>
+    </section>
+
+    <section class="table-wrap">
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Room</th><th>Computer</th><th>Wi-Fi IP</th><th>Wi-Fi MAC</th><th>Ethernet IP</th><th>Ethernet MAC</th><th>User</th><th>Status</th><th>Last seen</th><th>Actions</th></tr></thead>
+          <tbody id="devices">
+            <tr data-room="2054"><td class="room">2054</td><td class="host">R2054M01</td><td>192.0.2.21</td><td>02:54:00:00:00:01</td><td>198.51.100.21</td><td>02:54:10:00:00:01</td><td>student</td><td><span class="status online">Online</span></td><td>1 min ago</td><td class="actions"><button class="small connect" data-demo="Opens this Mac in Screen Sharing using its current VNC address.">Connect via VNC</button><button class="small" data-demo="Would send a Wake-on-LAN packet in production.">Wake</button></td></tr>
+            <tr data-room="2054"><td class="room">2054</td><td class="host">R2054M02</td><td>192.0.2.22</td><td>02:54:00:00:00:02</td><td>198.51.100.22</td><td>02:54:10:00:00:02</td><td>student</td><td><span class="status online">Online</span></td><td>3 min ago</td><td class="actions"><button class="small connect" data-demo="Opens this Mac in Screen Sharing using its current VNC address.">Connect via VNC</button><button class="small" data-demo="Would send a Wake-on-LAN packet in production.">Wake</button></td></tr>
+            <tr data-room="2054"><td class="room">2054</td><td class="host">R2054M03</td><td>192.0.2.23</td><td>02:54:00:00:00:03</td><td class="muted">—</td><td class="muted">—</td><td>designer</td><td><span class="status stale">Stale</span></td><td>42 min ago</td><td class="actions"><button class="small connect" data-demo="Opens this Mac in Screen Sharing using its current VNC address.">Connect via VNC</button><button class="small" data-demo="Would send a Wake-on-LAN packet in production.">Wake</button></td></tr>
+            <tr class="room-start" data-room="2057"><td class="room">2057</td><td class="host">R2057M01</td><td>192.0.2.31</td><td>02:57:00:00:00:01</td><td>198.51.100.31</td><td>02:57:10:00:00:01</td><td>student</td><td><span class="status online">Online</span></td><td>0 min ago</td><td class="actions"><button class="small connect" data-demo="Opens this Mac in Screen Sharing using its current VNC address.">Connect via VNC</button><button class="small" data-demo="Would send a Wake-on-LAN packet in production.">Wake</button></td></tr>
+            <tr data-room="2057"><td class="room">2057</td><td class="host">R2057M02</td><td class="muted">—</td><td class="muted">—</td><td>198.51.100.32</td><td>02:57:10:00:00:02</td><td>lecturer</td><td><span class="status online">Online</span></td><td>2 min ago</td><td class="actions"><button class="small connect" data-demo="Opens this Mac in Screen Sharing using its current VNC address.">Connect via VNC</button><button class="small" data-demo="Would send a Wake-on-LAN packet in production.">Wake</button></td></tr>
+            <tr data-room="2057"><td class="room">2057</td><td class="host">R2057M03</td><td>192.0.2.33</td><td>02:57:00:00:00:03</td><td>198.51.100.33</td><td>02:57:10:00:00:03</td><td>student</td><td><span class="status online">Online</span></td><td>4 min ago</td><td class="actions"><button class="small connect" data-demo="Opens this Mac in Screen Sharing using its current VNC address.">Connect via VNC</button><button class="small" data-demo="Would send a Wake-on-LAN packet in production.">Wake</button></td></tr>
+            <tr class="room-start" data-room="PLOTT"><td class="room">PLOTT</td><td class="host">PLOTTER01</td><td>192.0.2.41</td><td>02:7a:00:00:00:01</td><td class="muted">—</td><td class="muted">—</td><td>operator</td><td><span class="status stale">Stale</span></td><td>3 hr ago</td><td class="actions"><button class="small connect" data-demo="Opens this Mac in Screen Sharing using its current VNC address.">Connect via VNC</button><button class="small" data-demo="Would send a Wake-on-LAN packet in production.">Wake</button></td></tr>
+            <tr data-room="PLOTT"><td class="room">PLOTT</td><td class="host">PLOTTER02</td><td>192.0.2.42</td><td>02:7a:00:00:00:02</td><td class="muted">—</td><td class="muted">—</td><td>operator</td><td><span class="status online">Online</span></td><td>5 min ago</td><td class="actions"><button class="small connect" data-demo="Opens this Mac in Screen Sharing using its current VNC address.">Connect via VNC</button><button class="small" data-demo="Would send a Wake-on-LAN packet in production.">Wake</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <footer><span>Mac fleet dashboard interface</span><span>Heartbeat interval: 5 minutes</span></footer>
+  </main>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <script>
+    const filter = document.querySelector('#roomFilter');
+    const rows = [...document.querySelectorAll('#devices tr')];
+    const toast = document.querySelector('#toast');
+    let toastTimer;
+    function notify(message) {
+      toast.textContent = message; toast.classList.add('show');
+      clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), 2600);
+    }
+    filter.addEventListener('change', () => {
+      rows.forEach(row => row.hidden = filter.value !== 'all' && row.dataset.room !== filter.value);
+    });
+    document.querySelector('#refresh').addEventListener('click', () => notify('Dashboard refreshed — demo data remains unchanged.'));
+    document.querySelectorAll('[data-demo]').forEach(button => button.addEventListener('click', () => notify(button.dataset.demo)));
+  </script>
+</body>
+</html>
