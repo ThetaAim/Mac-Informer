@@ -18,6 +18,10 @@ Each Mac securely reports its current device, user, network, and availability da
 - Automatic client and server startup with macOS LaunchDaemons
 - HTTPS through Caddy with an internal certificate authority
 
+## Dashboard
+
+![Mac Informer Dashboard](examples/mac-informer-dashboard.png)
+
 ## Architecture
 
 ```text
