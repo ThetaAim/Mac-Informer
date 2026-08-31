@@ -20,7 +20,7 @@ Each Mac securely reports its current device, user, network, and availability da
 
 ## Dashboard
 
-![Mac Informer Dashboard](examples/mac-informer-dashboard.png)
+![Mac Informer Dashboard](examples/dashboard.png)
 
 ## Architecture
 
